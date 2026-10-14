@@ -262,10 +262,21 @@ def parse_args(argv):
         "without it they link to releases/desktop/ in the tree",
     )
     args = ap.parse_args(argv)
-    expected = ("dev-v" if args.channel == "dev" else "v") + args.version
-    if args.channel == "dev" and not args.tag:
-        ap.error(f"--channel dev requires --tag {expected}")
+    # An empty tag is a mistake (a variable that did not expand), never "no tag": it
+    # would silently take the historical mode and overwrite the published page.
+    if args.tag is not None and not args.tag:
+        ap.error("--tag needs a value: the tag of the release the buttons link to")
+    # Without a tag the buttons link to releases/desktop/ in the tree. That is wrong
+    # for dev either way: from /dev/index.html it is a folder that does not exist, and
+    # at the root it is PROD's installers under a banner that says "dev". Only prod
+    # keeps the historical mode, which is the page as it was before channels.
+    if args.channel == "dev" and args.tag is None:
+        ap.error(
+            f"--channel dev needs --tag dev-v{args.version}: its buttons must link to that "
+            "release's assets, never to files in the tree"
+        )
     if args.tag:
+        expected = ("dev-v" if args.channel == "dev" else "v") + args.version
         # A tag of the other channel would link the wrong installers, and a tag of
         # another version would label this page with a release it does not link.
         if not TAGS[args.channel].match(args.tag) or args.tag != expected:
