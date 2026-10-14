@@ -262,8 +262,10 @@ def parse_args(argv):
         "without it they link to releases/desktop/ in the tree",
     )
     args = ap.parse_args(argv)
+    expected = ("dev-v" if args.channel == "dev" else "v") + args.version
+    if args.channel == "dev" and not args.tag:
+        ap.error(f"--channel dev requires --tag {expected}")
     if args.tag:
-        expected = ("dev-v" if args.channel == "dev" else "v") + args.version
         # A tag of the other channel would link the wrong installers, and a tag of
         # another version would label this page with a release it does not link.
         if not TAGS[args.channel].match(args.tag) or args.tag != expected:

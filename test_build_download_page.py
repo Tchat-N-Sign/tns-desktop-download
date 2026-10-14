@@ -117,7 +117,7 @@ class DevPage(PageTest):
         self.assertNotIn(f"{RELEASE}/v0.6.0/", self.out)
 
     def test_it_is_written_into_a_folder_that_does_not_exist_yet(self):
-        self.build("0.6.0", DEV, "--channel", "dev", out="site/dev/index.html")
+        self.build("0.6.0", DEV, "--channel", "dev", "--tag", "dev-v0.6.0", out="site/dev/index.html")
         self.assertTrue(os.path.isfile(os.path.join(self.tmp.name, "site", "dev", "index.html")))
 
 
@@ -138,6 +138,16 @@ class Placeholders(PageTest):
 
 
 class Refusals(PageTest):
+    def test_dev_requires_its_release_tag_without_touching_existing_output(self):
+        root = self.installers(DEV)
+        out = os.path.join(self.tmp.name, "x.html")
+        with open(out, "w", encoding="utf-8") as f:
+            f.write("existing page")
+
+        self.assertIn("--channel dev requires --tag dev-v0.6.0", self.refused("0.6.0", root, out, "--channel", "dev"))
+        with open(out, encoding="utf-8") as f:
+            self.assertEqual(f.read(), "existing page")
+
     def test_a_dev_page_will_not_link_a_prod_tag_nor_the_reverse(self):
         root = self.installers(DEV)
         out = os.path.join(self.tmp.name, "x.html")
