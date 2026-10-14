@@ -46,14 +46,66 @@ live *here*, not in `tns-desktop`, so the deploy's `git add -A` carries them
 forward. Edit them on `main` here; don't expect an edit to survive if you also
 delete it from the clone.
 
+## Channels and release assets (TNSD-118)
+
+> **Status.** The generator below already does all of this. The deploy job in
+> `tns-desktop` still copies installers into `releases/desktop/` as described
+> above; it adopts the layout below in TNSD-268. Until then every step of
+> "How it's updated" is exactly as written.
+
+Two apps ship from here, **prod** ("Tchat N Sign") and **dev** ("Tchat N Sign
+Dev", for the team), and they install side by side.
+
+**Why the installers leave git.** `releases/desktop/` weighs 267 MB (the `.deb`
+and `.rpm` are 83 MB each, GitHub refuses a file over 100 MB), every deploy
+re-uploads all of it, and a second channel in the same tree would double that
+against Pages' 1 GB site limit. Installers become **assets of a GitHub Release on
+this repo**, one release per version and channel, and the site keeps only small
+files.
+
+| Where | What |
+|---|---|
+| Release `vX.Y.Z` (marked latest) | prod installers and updater artifacts |
+| Release `dev-vX.Y.Z` (pre-release) | dev installers and updater artifacts |
+| `/index.html`, `/latest.json` | prod page and updater feed. **Never move them**: installed apps poll this exact URL |
+| `/dev/index.html`, `/dev/latest.json` | dev page (`noindex`, no screenshots) and feed |
+
+Target deploy order, per channel: upload the release assets **first**, then
+write the feed and the page. A feed that names assets which are not up yet sends
+every running app that sees the new version to a 404 when it downloads. An app
+never needs to be told where a binary lives, only the feed: it follows whatever
+URL `latest.json` names.
+
 ## Regenerate the page locally
 
 ```sh
-python3 build_download_page.py 0.1.0 releases index.html
+# prod page, buttons pointing at the files in releases/desktop/ (how it linked before channels)
+python3 build_download_page.py 0.5.1 releases index.html
+
+# a channel page, buttons pointing at that release's assets
+python3 build_download_page.py 0.5.1 releases index.html     --channel prod --tag v0.5.1
+python3 build_download_page.py 0.6.0 releases dev/index.html --channel dev  --tag dev-v0.6.0
 ```
 
-Exits non-zero when `releases/desktop/` holds no installers — a page with no
-download buttons would silently replace a working one.
+`<releases_dir>/desktop/` holds the installers; they are listed for their names
+and sizes. With `--tag` the buttons link to
+`https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/<tag>/<file>`.
+Without options the output is byte-for-byte what this script produced before
+channels existed.
+
+It exits non-zero when `releases/desktop/` holds no installers — a page with no
+download buttons would silently replace a working one — and when `--tag` does not
+name the channel and version it is paired with (`vX.Y.Z` for prod, `dev-vX.Y.Z`
+for dev), so a dev page can never link prod's installers.
+
+## Tests
+
+```sh
+python3 -m unittest -v
+```
+
+Standard library only. This repo has no CI, so run them before pushing a change to
+`build_download_page.py`.
 
 ## Note on installer signing
 

@@ -9,11 +9,34 @@ surface and TNS ships nothing there, so it is gone rather than left rendering
 Run by tns-desktop's release workflow deploy step, which copies the app icon to
 tns-logo.png alongside the output.
 
+Two channels ship from this repo (TNSD-118): prod (the page at the site root) and
+dev (a page for the team, under dev/). Installers are not in git: they are assets
+of a GitHub Release on this repo, one release per version and channel, and --tag
+points the buttons at them. Without --tag the buttons point at releases/desktop/
+in the tree, which is how the page was built before the release assets existed.
+
 Usage: build_download_page.py <version> <releases_dir> <out_html>
+                              [--channel prod|dev] [--tag vX.Y.Z | dev-vX.Y.Z]
+
+<releases_dir>/desktop/ holds the installers: they are listed for their names and
+sizes, and only linked to as files when there is no --tag.
 """
+import argparse
 import html
 import os
+import re
 import sys
+import urllib.parse
+
+# The public repo whose Releases carry the installers (this repo).
+REPO = "Tchat-N-Sign/tns-desktop-download"
+
+# A release tag names its channel: vX.Y.Z is prod, dev-vX.Y.Z is dev. The page and
+# the tag must agree, or a dev page would link prod's installers (or the reverse).
+TAGS = {
+    "prod": re.compile(r"^v\d+\.\d+\.\d+$"),
+    "dev": re.compile(r"^dev-v\d+\.\d+\.\d+$"),
+}
 
 # Per-OS: (label, sub-label, [(ext, button label), …]). Order is the page order.
 # macOS is Apple-Silicon-only — the bundled llama-server sidecar is built for the
@@ -37,8 +60,8 @@ PAGE = """<!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Tchat N Sign — Application de bureau</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />__ROBOTS__
+<title>__TITLE__</title>
 <link rel="icon" href="tns-logo.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -94,33 +117,22 @@ PAGE = """<!doctype html>
     margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--hair);
     color: rgba(244, 239, 234, 0.45); font-size: 0.85rem;
   }
-  footer a { color: inherit; }
+  footer a { color: inherit; }__EXTRA_CSS__
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <img src="tns-logo.png" alt="" />
-      <h1>Tchat N Sign pour ordinateur</h1>
-      <p class="lede">Vos signatures, contacts, appels et télécopies sur le bureau.
-      Téléchargez, installez, connectez-vous — l&rsquo;application se met à jour d&rsquo;elle-même.</p>
-      <p class="ver">Version __VERSION__</p>
+      <h1>__H1__</h1>
+      <p class="lede">__LEDE__</p>
+      <p class="ver">Version __VERSION__</p>__BANNER__
     </header>
 
     <div class="rows">
 __ROWS__
     </div>
-
-    <section class="shots">
-      <h2>Un aperçu</h2>
-      <p>Signatures, contacts et conversations, dans une seule fenêtre.</p>
-      <div class="grid">
-        <figure><a href="screenshots/signatures.webp"><img src="screenshots/signatures.webp" alt="Le registre des signatures : chaque demande avec son statut, ses signataires et sa progression" loading="lazy" width="1600" height="1000" /></a><figcaption>Signatures — chaque demande, son statut et sa progression.</figcaption></figure>
-        <figure><a href="screenshots/contacts.webp"><img src="screenshots/contacts.webp" alt="Le répertoire des contacts avec courriel, téléphone et source" loading="lazy" width="1600" height="1000" /></a><figcaption>Contacts — le répertoire, avec doublons et sources.</figcaption></figure>
-        <figure><a href="screenshots/conversations.webp"><img src="screenshots/conversations.webp" alt="Une conversation SMS ouverte à côté de la boîte de réception" loading="lazy" width="1600" height="1000" /></a><figcaption>Conversations — SMS et courriels, assignés à l’équipe.</figcaption></figure>
-      </div>
-    </section>
-
+__SHOTS__
     <footer>
       <a href="https://github.com/Tchat-N-Sign/tns-desktop-download">dépôt des versions</a>
       &middot; <a href="latest.json">latest.json</a>
@@ -129,6 +141,58 @@ __ROWS__
 </body>
 </html>
 """
+
+
+# Shown on the prod page only: marketing for customers, noise on a build for the team.
+SHOTS_BLOCK = """\n    <section class="shots">
+      <h2>Un aperçu</h2>
+      <p>Signatures, contacts et conversations, dans une seule fenêtre.</p>
+      <div class="grid">
+        <figure><a href="screenshots/signatures.webp"><img src="screenshots/signatures.webp" alt="Le registre des signatures : chaque demande avec son statut, ses signataires et sa progression" loading="lazy" width="1600" height="1000" /></a><figcaption>Signatures — chaque demande, son statut et sa progression.</figcaption></figure>
+        <figure><a href="screenshots/contacts.webp"><img src="screenshots/contacts.webp" alt="Le répertoire des contacts avec courriel, téléphone et source" loading="lazy" width="1600" height="1000" /></a><figcaption>Contacts — le répertoire, avec doublons et sources.</figcaption></figure>
+        <figure><a href="screenshots/conversations.webp"><img src="screenshots/conversations.webp" alt="Une conversation SMS ouverte à côté de la boîte de réception" loading="lazy" width="1600" height="1000" /></a><figcaption>Conversations — SMS et courriels, assignés à l’équipe.</figcaption></figure>
+      </div>
+    </section>
+"""
+
+# What differs between the two pages. prod is the page customers land on, and it is
+# byte-for-byte what this script produced before channels existed. dev is for the
+# team: it says what it is, links back to the real page, and asks search engines to
+# stay away (this repo is public).
+CHANNELS = {
+    "prod": {
+        "title": "Tchat N Sign — Application de bureau",
+        "h1": "Tchat N Sign pour ordinateur",
+        "lede": (
+            "Vos signatures, contacts, appels et télécopies sur le bureau.\n"
+            "      Téléchargez, installez, connectez-vous — l&rsquo;application se met à jour d&rsquo;elle-même."
+        ),
+        "robots": "",
+        "extra_css": "",
+        "banner": "",
+        "shots": SHOTS_BLOCK,
+    },
+    "dev": {
+        "title": "Tchat N Sign Dev — Build de développement",
+        "h1": "Tchat N Sign Dev pour ordinateur",
+        "lede": (
+            "Version de développement pour l&rsquo;équipe. Elle s&rsquo;installe à côté de "
+            "l&rsquo;application Tchat N Sign et se met à jour d&rsquo;elle-même."
+        ),
+        "robots": '\n<meta name="robots" content="noindex, nofollow" />',
+        "extra_css": (
+            "\n  .devnote { margin: 16px 0 0; padding: 10px 14px; max-width: 34rem; font-size: 0.92rem;"
+            "\n    border: 1px solid #b45309; border-radius: 8px; background: rgba(180, 83, 9, 0.18); }"
+            "\n  .devnote a { color: inherit; }"
+        ),
+        "banner": (
+            '\n      <p class="devnote">Build de développement : connecté à l&rsquo;environnement de dev, '
+            "pas à vos données de production. L&rsquo;application des clients se télécharge sur "
+            '<a href="../">la page principale</a>.</p>'
+        ),
+        "shots": "",
+    },
+}
 
 
 def _size(path):
@@ -140,14 +204,25 @@ def _size(path):
     return f' <span class="sz">{mb:.0f} Mo</span>'
 
 
-def build_rows(desktop_dir, files):
+def asset_href(name, tag):
+    """Where a button sends the browser: the asset of the release `tag` when there
+    is one, else the file in the tree (how the page linked before release assets)."""
+    if tag:
+        return (
+            f"https://github.com/{REPO}/releases/download/"
+            f"{urllib.parse.quote(tag)}/{urllib.parse.quote(name)}"
+        )
+    return "releases/desktop/" + name
+
+
+def build_rows(desktop_dir, files, tag=None):
     rows = []
     for os_name, sub, exts in GROUPS:
         buttons = []
         for ext, label in exts:
             for name in (f for f in files if f.endswith(ext)):
                 cls = "btn" if not buttons else "btn alt"
-                href = "releases/desktop/" + html.escape(name, quote=True)
+                href = html.escape(asset_href(name, tag), quote=True)
                 buttons.append(
                     f'<a class="{cls}" href="{href}">{html.escape(label)}'
                     f"{_size(os.path.join(desktop_dir, name))}</a>"
@@ -163,23 +238,56 @@ def build_rows(desktop_dir, files):
     return "\n".join(rows)
 
 
-def main():
-    if len(sys.argv) != 4:
-        sys.exit("usage: build_download_page.py <version> <releases_dir> <out_html>")
-    version, releases_dir, out_path = sys.argv[1], sys.argv[2], sys.argv[3]
+def render(version, rows, channel="prod"):
+    """The page for `channel`: every CHANNELS entry fills its __KEY__ placeholder."""
+    page = PAGE
+    for key, value in CHANNELS[channel].items():
+        page = page.replace(f"__{key.upper()}__", value)
+    return page.replace("__VERSION__", html.escape(version)).replace("__ROWS__", rows)
+
+
+def parse_args(argv):
+    ap = argparse.ArgumentParser(
+        prog="build_download_page.py",
+        description="Generate the download page of one channel. <releases_dir>/desktop/ "
+        "holds the installers (listed for their names and sizes).",
+    )
+    ap.add_argument("version", help="the version shown on the page, e.g. 0.6.0")
+    ap.add_argument("releases_dir")
+    ap.add_argument("out_html")
+    ap.add_argument("--channel", choices=sorted(CHANNELS), default="prod")
+    ap.add_argument(
+        "--tag",
+        help="link the buttons to this release's assets (vX.Y.Z for prod, dev-vX.Y.Z for dev); "
+        "without it they link to releases/desktop/ in the tree",
+    )
+    args = ap.parse_args(argv)
+    if args.tag:
+        expected = ("dev-v" if args.channel == "dev" else "v") + args.version
+        # A tag of the other channel would link the wrong installers, and a tag of
+        # another version would label this page with a release it does not link.
+        if not TAGS[args.channel].match(args.tag) or args.tag != expected:
+            ap.error(f"--tag {args.tag} does not match --channel {args.channel} and version {args.version} (expected {expected})")
+    return args
+
+
+def main(argv=None):
+    args = parse_args(sys.argv[1:] if argv is None else argv)
     # Installers live in releases/desktop/ so the layout matches the sibling
     # luge-desktop-download repo and the deploy step can wipe just that subdir.
-    desktop_dir = os.path.join(releases_dir, "desktop")
+    desktop_dir = os.path.join(args.releases_dir, "desktop")
     files = sorted(os.listdir(desktop_dir)) if os.path.isdir(desktop_dir) else []
-    rows = build_rows(desktop_dir, files)
+    rows = build_rows(desktop_dir, files, args.tag)
     # Fail loudly: a page with no download buttons is worse than a failed deploy,
     # because it silently replaces a working page.
     if not rows:
         sys.exit(f"no installers found in {desktop_dir}")
-    page = PAGE.replace("__VERSION__", html.escape(version)).replace("__ROWS__", rows)
-    with open(out_path, "w", encoding="utf-8") as f:
-        f.write(page)
-    print(f"wrote {out_path} ({len(files)} assets)")
+    out_dir = os.path.dirname(args.out_html)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+    with open(args.out_html, "w", encoding="utf-8") as f:
+        f.write(render(args.version, rows, args.channel))
+    print(f"wrote {args.out_html} ({len(files)} assets)")
 
 
 if __name__ == "__main__":
