@@ -28,6 +28,12 @@ import re
 import sys
 import urllib.parse
 
+def t(fr, en):
+    """Inline text in both languages: the page shows one (TNSD-348). Both are
+    already HTML (entities included); the visitor's choice hides the other."""
+    return f'<span class="l-fr">{fr}</span><span class="l-en">{en}</span>'
+
+
 # The public repo whose Releases carry the installers (this repo).
 REPO = "Tchat-N-Sign/tns-desktop-download"
 
@@ -43,21 +49,29 @@ TAGS = {
 # host arch, so there is no universal build. Saying so here saves a support round
 # trip with anyone still on an Intel Mac.
 GROUPS = [
-    ("macOS", "Puce Apple (M1 et plus récent)", [(".dmg", "Télécharger (.dmg)")]),
-    ("Windows", "64 bits", [(".exe", "Installateur (.exe)"), (".msi", "Paquet (.msi)")]),
+    (
+        "macOS",
+        ("Puce Apple (M1 et plus récent)", "Apple chip (M1 and newer)"),
+        [(".dmg", ("Télécharger (.dmg)", "Download (.dmg)"))],
+    ),
+    (
+        "Windows",
+        ("64 bits", "64-bit"),
+        [(".exe", ("Installateur (.exe)", "Installer (.exe)")), (".msi", ("Paquet (.msi)", "Package (.msi)"))],
+    ),
     (
         "Linux",
-        "64 bits",
+        ("64 bits", "64-bit"),
         [
-            (".AppImage", "AppImage"),
-            (".deb", "Debian / Ubuntu (.deb)"),
-            (".rpm", "Fedora / RHEL (.rpm)"),
+            (".AppImage", ("AppImage", "AppImage")),
+            (".deb", ("Debian / Ubuntu (.deb)", "Debian / Ubuntu (.deb)")),
+            (".rpm", ("Fedora / RHEL (.rpm)", "Fedora / RHEL (.rpm)")),
         ],
     ),
 ]
 
 PAGE = """<!doctype html>
-<html lang="fr">
+<html lang="fr" data-title-fr="__TITLE__" data-title-en="__TITLE_EN__">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />__ROBOTS__
@@ -117,10 +131,18 @@ PAGE = """<!doctype html>
     margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--hair);
     color: rgba(244, 239, 234, 0.45); font-size: 0.85rem;
   }
-  footer a { color: inherit; }__EXTRA_CSS__
+  footer a { color: inherit; }
+  /* One language at a time (TNSD-348): French unless the visitor chose English. */
+  .l-en { display: none; }
+  html.en .l-en { display: inline; }
+  html.en .l-fr { display: none; }
+  .langs { position: absolute; top: 20px; right: 24px; font-size: 0.85rem; color: rgba(244, 239, 234, 0.5); }
+  .langs a { color: rgba(244, 239, 234, 0.7); text-decoration: none; padding: 2px 4px; }
+  .langs a[aria-current="true"] { color: var(--ink); font-weight: 600; }__EXTRA_CSS__
 </style>
 </head>
 <body>
+  <nav class="langs" aria-label="Langue / Language"><a href="?lang=fr" data-lang="fr" hreflang="fr">FR</a> &middot; <a href="?lang=en" data-lang="en" hreflang="en">EN</a></nav>
   <div class="wrap">
     <header>
       <img src="tns-logo.png" alt="" />
@@ -134,10 +156,31 @@ __ROWS__
     </div>
 __SHOTS__
     <footer>
-      <a href="https://github.com/Tchat-N-Sign/tns-desktop-download">dépôt des versions</a>
+      <a href="https://github.com/Tchat-N-Sign/tns-desktop-download">__REPO_LINK__</a>
       &middot; <a href="latest.json">latest.json</a>
     </footer>
   </div>
+  <script>
+    // The language: ?lang= first, then the visitor's last choice, then the browser.
+    (function () {
+      var q = new URLSearchParams(location.search).get("lang");
+      var saved = null;
+      try { saved = localStorage.getItem("lang"); } catch (e) {}
+      var lang = q === "en" || q === "fr" ? q : saved === "en" || saved === "fr" ? saved
+        : /^en/i.test(navigator.language || "") ? "en" : "fr";
+      try { if (q === "en" || q === "fr") localStorage.setItem("lang", q); } catch (e) {}
+      var root = document.documentElement;
+      root.lang = lang;
+      root.classList.toggle("en", lang === "en");
+      document.title = root.getAttribute("data-title-" + lang) || document.title;
+      document.querySelectorAll("[data-alt-" + lang + "]").forEach(function (img) {
+        img.alt = img.getAttribute("data-alt-" + lang);
+      });
+      document.querySelectorAll(".langs a").forEach(function (a) {
+        a.setAttribute("aria-current", a.getAttribute("data-lang") === lang ? "true" : "false");
+      });
+    })();
+  </script>
 </body>
 </html>
 """
@@ -145,28 +188,32 @@ __SHOTS__
 
 # Shown on the prod page only: marketing for customers, noise on a build for the team.
 SHOTS_BLOCK = """\n    <section class="shots">
-      <h2>Un aperçu</h2>
-      <p>Signatures, contacts et conversations, dans une seule fenêtre.</p>
+      <h2>""" + t("Un aperçu", "A preview") + """</h2>
+      <p>""" + t("Signatures, contacts et conversations, dans une seule fenêtre.", "Signatures, contacts and conversations, in a single window.") + """</p>
       <div class="grid">
-        <figure><a href="screenshots/signatures.webp"><img src="screenshots/signatures.webp" alt="Le registre des signatures : chaque demande avec son statut, ses signataires et sa progression" loading="lazy" width="1600" height="1000" /></a><figcaption>Signatures — chaque demande, son statut et sa progression.</figcaption></figure>
-        <figure><a href="screenshots/contacts.webp"><img src="screenshots/contacts.webp" alt="Le répertoire des contacts avec courriel, téléphone et source" loading="lazy" width="1600" height="1000" /></a><figcaption>Contacts — le répertoire, avec doublons et sources.</figcaption></figure>
-        <figure><a href="screenshots/conversations.webp"><img src="screenshots/conversations.webp" alt="Une conversation SMS ouverte à côté de la boîte de réception" loading="lazy" width="1600" height="1000" /></a><figcaption>Conversations — SMS et courriels, assignés à l’équipe.</figcaption></figure>
+        <figure><a href="screenshots/signatures.webp"><img src="screenshots/signatures.webp" alt="Le registre des signatures : chaque demande avec son statut, ses signataires et sa progression" data-alt-en="The signature register: each request with its status, its signers and its progress" loading="lazy" width="1600" height="1000" /></a><figcaption>""" + t("Signatures — chaque demande, son statut et sa progression.", "Signatures: each request, its status and its progress.") + """</figcaption></figure>
+        <figure><a href="screenshots/contacts.webp"><img src="screenshots/contacts.webp" alt="Le répertoire des contacts avec courriel, téléphone et source" data-alt-en="The contact directory with email, phone and source" loading="lazy" width="1600" height="1000" /></a><figcaption>""" + t("Contacts — le répertoire, avec doublons et sources.", "Contacts: the directory, with duplicates and sources.") + """</figcaption></figure>
+        <figure><a href="screenshots/conversations.webp"><img src="screenshots/conversations.webp" alt="Une conversation SMS ouverte à côté de la boîte de réception" data-alt-en="An SMS conversation open next to the inbox" loading="lazy" width="1600" height="1000" /></a><figcaption>""" + t("Conversations — SMS et courriels, assignés à l’équipe.", "Conversations: SMS and email, assigned to the team.") + """</figcaption></figure>
       </div>
     </section>
 """
 
-# What differs between the two pages. prod is the page customers land on, and it is
-# byte-for-byte what this script produced before channels existed. dev is for the
+# What differs between the two pages. prod is the page customers land on, in French
+# and English since TNSD-348 (French alone before). dev is for the
 # team: it says what it is, links back to the real page, and asks search engines to
 # stay away (this repo is public).
 CHANNELS = {
     "prod": {
         "title": "Tchat N Sign — Application de bureau",
-        "h1": "Tchat N Sign pour ordinateur",
-        "lede": (
+        "title_en": "Tchat N Sign · Desktop app",
+        "h1": t("Tchat N Sign pour ordinateur", "Tchat N Sign for desktop"),
+        "lede": t(
             "Vos signatures, contacts, appels et télécopies sur le bureau.\n"
-            "      Téléchargez, installez, connectez-vous — l&rsquo;application se met à jour d&rsquo;elle-même."
+            "      Téléchargez, installez, connectez-vous — l&rsquo;application se met à jour d&rsquo;elle-même.",
+            "Your signatures, contacts, calls and faxes on your desktop.\n"
+            "      Download, install, sign in: the app updates itself.",
         ),
+        "repo_link": t("dépôt des versions", "release repository"),
         "robots": "",
         "extra_css": "",
         "banner": "",
@@ -174,11 +221,15 @@ CHANNELS = {
     },
     "dev": {
         "title": "Tchat N Sign Dev — Build de développement",
-        "h1": "Tchat N Sign Dev pour ordinateur",
-        "lede": (
+        "title_en": "Tchat N Sign Dev · Development build",
+        "h1": t("Tchat N Sign Dev pour ordinateur", "Tchat N Sign Dev for desktop"),
+        "lede": t(
             "Version de développement pour l&rsquo;équipe. Elle s&rsquo;installe à côté de "
-            "l&rsquo;application Tchat N Sign et se met à jour d&rsquo;elle-même."
+            "l&rsquo;application Tchat N Sign et se met à jour d&rsquo;elle-même.",
+            "Development version for the team. It installs next to the Tchat N Sign app "
+            "and updates itself.",
         ),
+        "repo_link": t("dépôt des versions", "release repository"),
         "robots": '\n<meta name="robots" content="noindex, nofollow" />',
         "extra_css": (
             "\n  .devnote { margin: 16px 0 0; padding: 10px 14px; max-width: 34rem; font-size: 0.92rem;"
@@ -186,9 +237,15 @@ CHANNELS = {
             "\n  .devnote a { color: inherit; }"
         ),
         "banner": (
-            '\n      <p class="devnote">Build de développement : connecté à l&rsquo;environnement de dev, '
-            "pas à vos données de production. L&rsquo;application des clients se télécharge sur "
-            '<a href="../">la page principale</a>.</p>'
+            '\n      <p class="devnote">'
+            + t(
+                "Build de développement : connecté à l&rsquo;environnement de dev, "
+                "pas à vos données de production. L&rsquo;application des clients se télécharge sur "
+                '<a href="../">la page principale</a>.',
+                "Development build: connected to the dev environment, not to your production data. "
+                'The customers&rsquo; app is downloaded from <a href="../">the main page</a>.',
+            )
+            + "</p>"
         ),
         "shots": "",
     },
@@ -201,7 +258,7 @@ def _size(path):
         mb = os.path.getsize(path) / 1_000_000
     except OSError:
         return ""
-    return f' <span class="sz">{mb:.0f} Mo</span>'
+    return f' <span class="sz">{t(f"{mb:.0f} Mo", f"{mb:.0f} MB")}</span>'
 
 
 def asset_href(name, tag):
@@ -217,21 +274,21 @@ def asset_href(name, tag):
 
 def build_rows(desktop_dir, files, tag=None):
     rows = []
-    for os_name, sub, exts in GROUPS:
+    for os_name, (sub_fr, sub_en), exts in GROUPS:
         buttons = []
-        for ext, label in exts:
+        for ext, (label_fr, label_en) in exts:
             for name in (f for f in files if f.endswith(ext)):
                 cls = "btn" if not buttons else "btn alt"
                 href = html.escape(asset_href(name, tag), quote=True)
                 buttons.append(
-                    f'<a class="{cls}" href="{href}">{html.escape(label)}'
+                    f'<a class="{cls}" href="{href}">{t(html.escape(label_fr), html.escape(label_en))}'
                     f"{_size(os.path.join(desktop_dir, name))}</a>"
                 )
         if buttons:
             rows.append(
                 f'      <div class="row">\n'
                 f'        <div class="os"><h2>{html.escape(os_name)}</h2>'
-                f"<p>{html.escape(sub)}</p></div>\n"
+                f"<p>{t(html.escape(sub_fr), html.escape(sub_en))}</p></div>\n"
                 f'        <div class="dls">{"".join(buttons)}</div>\n'
                 f"      </div>"
             )

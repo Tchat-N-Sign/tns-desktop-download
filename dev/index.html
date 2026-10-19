@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-title-fr="Tchat N Sign Dev — Build de développement" data-title-en="Tchat N Sign Dev · Development build">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -61,40 +61,69 @@
     color: rgba(244, 239, 234, 0.45); font-size: 0.85rem;
   }
   footer a { color: inherit; }
+  /* One language at a time (TNSD-348): French unless the visitor chose English. */
+  .l-en { display: none; }
+  html.en .l-en { display: inline; }
+  html.en .l-fr { display: none; }
+  .langs { position: absolute; top: 20px; right: 24px; font-size: 0.85rem; color: rgba(244, 239, 234, 0.5); }
+  .langs a { color: rgba(244, 239, 234, 0.7); text-decoration: none; padding: 2px 4px; }
+  .langs a[aria-current="true"] { color: var(--ink); font-weight: 600; }
   .devnote { margin: 16px 0 0; padding: 10px 14px; max-width: 34rem; font-size: 0.92rem;
     border: 1px solid #b45309; border-radius: 8px; background: rgba(180, 83, 9, 0.18); }
   .devnote a { color: inherit; }
 </style>
 </head>
 <body>
+  <nav class="langs" aria-label="Langue / Language"><a href="?lang=fr" data-lang="fr" hreflang="fr">FR</a> &middot; <a href="?lang=en" data-lang="en" hreflang="en">EN</a></nav>
   <div class="wrap">
     <header>
       <img src="tns-logo.png" alt="" />
-      <h1>Tchat N Sign Dev pour ordinateur</h1>
-      <p class="lede">Version de développement pour l&rsquo;équipe. Elle s&rsquo;installe à côté de l&rsquo;application Tchat N Sign et se met à jour d&rsquo;elle-même.</p>
+      <h1><span class="l-fr">Tchat N Sign Dev pour ordinateur</span><span class="l-en">Tchat N Sign Dev for desktop</span></h1>
+      <p class="lede"><span class="l-fr">Version de développement pour l&rsquo;équipe. Elle s&rsquo;installe à côté de l&rsquo;application Tchat N Sign et se met à jour d&rsquo;elle-même.</span><span class="l-en">Development version for the team. It installs next to the Tchat N Sign app and updates itself.</span></p>
       <p class="ver">Version 0.6.1</p>
-      <p class="devnote">Build de développement : connecté à l&rsquo;environnement de dev, pas à vos données de production. L&rsquo;application des clients se télécharge sur <a href="../">la page principale</a>.</p>
+      <p class="devnote"><span class="l-fr">Build de développement : connecté à l&rsquo;environnement de dev, pas à vos données de production. L&rsquo;application des clients se télécharge sur <a href="../">la page principale</a>.</span><span class="l-en">Development build: connected to the dev environment, not to your production data. The customers&rsquo; app is downloaded from <a href="../">the main page</a>.</span></p>
     </header>
 
     <div class="rows">
       <div class="row">
-        <div class="os"><h2>macOS</h2><p>Puce Apple (M1 et plus récent)</p></div>
-        <div class="dls"><a class="btn" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev_0.6.1_aarch64.dmg">Télécharger (.dmg) <span class="sz">22 Mo</span></a></div>
+        <div class="os"><h2>macOS</h2><p><span class="l-fr">Puce Apple (M1 et plus récent)</span><span class="l-en">Apple chip (M1 and newer)</span></p></div>
+        <div class="dls"><a class="btn" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev_0.6.1_aarch64.dmg"><span class="l-fr">Télécharger (.dmg)</span><span class="l-en">Download (.dmg)</span> <span class="sz"><span class="l-fr">22 Mo</span><span class="l-en">22 MB</span></span></a></div>
       </div>
       <div class="row">
-        <div class="os"><h2>Windows</h2><p>64 bits</p></div>
-        <div class="dls"><a class="btn" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev_0.6.1_x64-setup.exe">Installateur (.exe) <span class="sz">21 Mo</span></a><a class="btn alt" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev_0.6.1_x64_en-US.msi">Paquet (.msi) <span class="sz">35 Mo</span></a></div>
+        <div class="os"><h2>Windows</h2><p><span class="l-fr">64 bits</span><span class="l-en">64-bit</span></p></div>
+        <div class="dls"><a class="btn" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev_0.6.1_x64-setup.exe"><span class="l-fr">Installateur (.exe)</span><span class="l-en">Installer (.exe)</span> <span class="sz"><span class="l-fr">21 Mo</span><span class="l-en">21 MB</span></span></a><a class="btn alt" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev_0.6.1_x64_en-US.msi"><span class="l-fr">Paquet (.msi)</span><span class="l-en">Package (.msi)</span> <span class="sz"><span class="l-fr">35 Mo</span><span class="l-en">35 MB</span></span></a></div>
       </div>
       <div class="row">
-        <div class="os"><h2>Linux</h2><p>64 bits</p></div>
-        <div class="dls"><a class="btn" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev_0.6.1_amd64.deb">Debian / Ubuntu (.deb) <span class="sz">84 Mo</span></a><a class="btn alt" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev-0.6.1-1.x86_64.rpm">Fedora / RHEL (.rpm) <span class="sz">84 Mo</span></a></div>
+        <div class="os"><h2>Linux</h2><p><span class="l-fr">64 bits</span><span class="l-en">64-bit</span></p></div>
+        <div class="dls"><a class="btn" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev_0.6.1_amd64.deb"><span class="l-fr">Debian / Ubuntu (.deb)</span><span class="l-en">Debian / Ubuntu (.deb)</span> <span class="sz"><span class="l-fr">84 Mo</span><span class="l-en">84 MB</span></span></a><a class="btn alt" href="https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/dev-v0.6.1/Tchat.N.Sign.Dev-0.6.1-1.x86_64.rpm"><span class="l-fr">Fedora / RHEL (.rpm)</span><span class="l-en">Fedora / RHEL (.rpm)</span> <span class="sz"><span class="l-fr">84 Mo</span><span class="l-en">84 MB</span></span></a></div>
       </div>
     </div>
 
     <footer>
-      <a href="https://github.com/Tchat-N-Sign/tns-desktop-download">dépôt des versions</a>
+      <a href="https://github.com/Tchat-N-Sign/tns-desktop-download"><span class="l-fr">dépôt des versions</span><span class="l-en">release repository</span></a>
       &middot; <a href="latest.json">latest.json</a>
     </footer>
   </div>
+  <script>
+    // The language: ?lang= first, then the visitor's last choice, then the browser.
+    (function () {
+      var q = new URLSearchParams(location.search).get("lang");
+      var saved = null;
+      try { saved = localStorage.getItem("lang"); } catch (e) {}
+      var lang = q === "en" || q === "fr" ? q : saved === "en" || saved === "fr" ? saved
+        : /^en/i.test(navigator.language || "") ? "en" : "fr";
+      try { if (q === "en" || q === "fr") localStorage.setItem("lang", q); } catch (e) {}
+      var root = document.documentElement;
+      root.lang = lang;
+      root.classList.toggle("en", lang === "en");
+      document.title = root.getAttribute("data-title-" + lang) || document.title;
+      document.querySelectorAll("[data-alt-" + lang + "]").forEach(function (img) {
+        img.alt = img.getAttribute("data-alt-" + lang);
+      });
+      document.querySelectorAll(".langs a").forEach(function (a) {
+        a.setAttribute("aria-current", a.getAttribute("data-lang") === lang ? "true" : "false");
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -46,6 +46,14 @@ live *here*, not in `tns-desktop`, so the deploy's `git add -A` carries them
 forward. Edit them on `main` here; don't expect an edit to survive if you also
 delete it from the clone.
 
+## Languages (TNSD-348)
+
+The page is in French and English. Every text is written in both (`t(fr, en)` in
+`build_download_page.py`); a small inline script shows one: `?lang=en` or `?lang=fr`
+first, then the visitor's last choice, then the browser's language. Without
+JavaScript the page stays in French. Link `https://download.tchatnsign.com/?lang=en`
+from English material.
+
 ## Channels and release assets (TNSD-118)
 
 > **Status.** The generator below already does all of this. The deploy job in
