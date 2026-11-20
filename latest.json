@@ -1,0 +1,39 @@
+{
+  "version": "0.7.9",
+  "notes": "",
+  "pub_date": "2026-11-20T02:05:04.460Z",
+  "platforms": {
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRY3BJQS9GK1NveUhCLy9zcjUyNDN4SStEQWYySzNtSm56b1VNeVR6RmtIeEMwajA2cmVSdU50N0NqbVJWdWIvcDQyTTJMYnRCNXR3NWU3R1g2WVY1WUw0eXFvQ3B4QkFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTI3MDgxCWZpbGU6VGNoYXQgTiBTaWduLmFwcC50YXIuZ3oJdmVyc2lvbjowLjcuOQpORTRsMGFvY2wvRlFBUDJHVFJJT1d2aXFDSnJmYWRGcDlGTGRRcHljMnlRMVlpNkoxQTdIbWFFTVl0cENScHFsOU5yaWx0UHQxdzVuL1JCcEp5a2REUT09Cg==",
+      "url": "https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/v0.7.9/Tchat.N.Sign_aarch64.app.tar.gz"
+    },
+    "darwin-aarch64-app": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRY3BJQS9GK1NveUhCLy9zcjUyNDN4SStEQWYySzNtSm56b1VNeVR6RmtIeEMwajA2cmVSdU50N0NqbVJWdWIvcDQyTTJMYnRCNXR3NWU3R1g2WVY1WUw0eXFvQ3B4QkFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTI3MDgxCWZpbGU6VGNoYXQgTiBTaWduLmFwcC50YXIuZ3oJdmVyc2lvbjowLjcuOQpORTRsMGFvY2wvRlFBUDJHVFJJT1d2aXFDSnJmYWRGcDlGTGRRcHljMnlRMVlpNkoxQTdIbWFFTVl0cENScHFsOU5yaWx0UHQxdzVuL1JCcEp5a2REUT09Cg==",
+      "url": "https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/v0.7.9/Tchat.N.Sign_aarch64.app.tar.gz"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRY3BJQS9GK1NveUpiZHhMckxDTkU1L1Q5K3Jna1RNb2lLbmhuMTFzOEU1K1ZSZkpxUFgrY2R0WGxpcTIyVjRMMVVNV0wyb21RVzJSVHRseUd0UjZBdENQR016QVRZdkEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTI4Njc0CWZpbGU6VGNoYXQgTiBTaWduXzAuNy45X3g2NF9lbi1VUy5tc2kJdmVyc2lvbjowLjcuOQo0dFVFUzQ2ZEM2UjlhNkVBcUpxTFM5UDZ1aFViZmVZYWhvS3QvS0hFczNGdERQeVZVbFp5L3V5cHVBU25YZFJsODNyNldzTnJZMk5yQUljMm9aczBBQT09Cg==",
+      "url": "https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/v0.7.9/Tchat.N.Sign_0.7.9_x64_en-US.msi"
+    },
+    "windows-x86_64-msi": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRY3BJQS9GK1NveUpiZHhMckxDTkU1L1Q5K3Jna1RNb2lLbmhuMTFzOEU1K1ZSZkpxUFgrY2R0WGxpcTIyVjRMMVVNV0wyb21RVzJSVHRseUd0UjZBdENQR016QVRZdkEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTI4Njc0CWZpbGU6VGNoYXQgTiBTaWduXzAuNy45X3g2NF9lbi1VUy5tc2kJdmVyc2lvbjowLjcuOQo0dFVFUzQ2ZEM2UjlhNkVBcUpxTFM5UDZ1aFViZmVZYWhvS3QvS0hFczNGdERQeVZVbFp5L3V5cHVBU25YZFJsODNyNldzTnJZMk5yQUljMm9aczBBQT09Cg==",
+      "url": "https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/v0.7.9/Tchat.N.Sign_0.7.9_x64_en-US.msi"
+    },
+    "windows-x86_64-nsis": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRY3BJQS9GK1NveUQ2T0kybFQ2eDhnYk5JRDJEMDBkVERUS0dGOWZNME9Zd3huK0xsQ3hoWXc2bWdWZFRzeWFHTkhGZ1NsbmZaUzhxM0liUlJ6R2pINDRiZEV3RnVxeUEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTI4Njc0CWZpbGU6VGNoYXQgTiBTaWduXzAuNy45X3g2NC1zZXR1cC5leGUJdmVyc2lvbjowLjcuOQprejhFUDE4OWJINitSK1ZIT3c2cERvTE41T3Y3cVEzTEh4ckhoQlpxc1l6Z0hkM1N0UEwxSlcxWUk2ZmdHcEtJRmxqZkQ3N2Y0S1lzQ0YyZHJMN2hEQT09Cg==",
+      "url": "https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/v0.7.9/Tchat.N.Sign_0.7.9_x64-setup.exe"
+    },
+    "linux-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRY3BJQS9GK1NveU5DQUdXTHMrek8xa3hVd2N6VjlMdERBdjRRcDE5a1l6MGpPcE93VzhIVFlhY0p4M25yRktuRXU3eEpiWFVHMXJBaWladG1IeHY0dXI0OWF4bUlNS3dzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQwMjk2CWZpbGU6VGNoYXQgTiBTaWduXzAuNy45X2FtZDY0LmRlYgl2ZXJzaW9uOjAuNy45CklLZGpJQmdhb01MSWtGMUpmU3I0NzQ4M0hMZFdCOGYrdkd2bUV0Zi90K3BBZXhWbU1xVWFheXdyVDJuZzh1LzhvaVB4TmU0U2FkWGxYVU9TMnp2OURRPT0K",
+      "url": "https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/v0.7.9/Tchat.N.Sign_0.7.9_amd64.deb"
+    },
+    "linux-x86_64-deb": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRY3BJQS9GK1NveU5DQUdXTHMrek8xa3hVd2N6VjlMdERBdjRRcDE5a1l6MGpPcE93VzhIVFlhY0p4M25yRktuRXU3eEpiWFVHMXJBaWladG1IeHY0dXI0OWF4bUlNS3dzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQwMjk2CWZpbGU6VGNoYXQgTiBTaWduXzAuNy45X2FtZDY0LmRlYgl2ZXJzaW9uOjAuNy45CklLZGpJQmdhb01MSWtGMUpmU3I0NzQ4M0hMZFdCOGYrdkd2bUV0Zi90K3BBZXhWbU1xVWFheXdyVDJuZzh1LzhvaVB4TmU0U2FkWGxYVU9TMnp2OURRPT0K",
+      "url": "https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/v0.7.9/Tchat.N.Sign_0.7.9_amd64.deb"
+    },
+    "linux-x86_64-rpm": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRY3BJQS9GK1NveVAxYnd3VFdYdGhOU242WDY3eUlFQ2xteER0OTV2a1RqcGpGcTRONEU1c09QR2pqN21XbTcxWUFVVGVic0piS3pWcmJBVHdrZm05ZEQ5b2NTb0VGS1E0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQwMjk2CWZpbGU6VGNoYXQgTiBTaWduLTAuNy45LTEueDg2XzY0LnJwbQl2ZXJzaW9uOjAuNy45CnFtZGxKYWxtOTYwSjVveGR5SUwvZk1zdzdsZFhjQzJHdkxTR2JOSUxnT3hIV0tka3dNMUhtdUluSkNVVFVwakhuSStudnkveE1kMXFMN01OVlNBS0NRPT0K",
+      "url": "https://github.com/Tchat-N-Sign/tns-desktop-download/releases/download/v0.7.9/Tchat.N.Sign-0.7.9-1.x86_64.rpm"
+    }
+  }
+}
